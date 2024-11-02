@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken"
 import crypto from "node:crypto"
 
 const userCollection = []
+console.log(userCollection)
 
 const app = express()
 
@@ -14,7 +15,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 app.use(morgan("dev"))
 app.use(cors({
-  origin: "http://localhost:4000",
+  origin: "http://localhost:5173",
   credentials: true,
   methods: ["GET", "POST"],
 }))
