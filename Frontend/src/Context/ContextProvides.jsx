@@ -2,8 +2,9 @@ import React, { createContext, useContext, useEffect, useReducer } from 'react';
 import { reducer } from './reducer.js';
 import { initialState } from './initialStates.js';
 import { authTypes } from './authTypes.js';
+import { logoutService } from '../Services/api.Services.js';
 
-const newContext = createContext();
+const NewContext = createContext();
 
 export const ContextProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -20,7 +21,7 @@ export const ContextProvider = ({ children }) => {
             });
             const data = await response.json(); // Esperar la respuesta
 
-            if (response.ok) {
+            if (data) {
                 dispatch({ type: authTypes.isLogged, payload: data });
             } else {
                 throw new Error(data.message || "Credenciales inválidas");
@@ -58,27 +59,37 @@ export const ContextProvider = ({ children }) => {
                 method: "GET",
                 credentials: "include",
             });
-            if (response.ok) {
-            const data = await response.json(); // Esperar a obtener los datos
-            dispatch({ type: authTypes.isLogged, payload: data }); // Despachar con los datos del usuario
-            } else {
-                throw new Error("Error al mantener la sesión");
+            if (!response.ok) {
+                throw new Error("Erro")
             }
+            const data = await response.json();
+            dispatch({ type: authTypes.isLogged, payload: data });
         } catch (error) {
+            dispatch({ type: authTypes.loggedOut })
             console.error("Error al mantener la sesión: ", error.message);
         }
     };
-    
 
-    useEffect(()=>{
+    const signOut = async () => {
+        const response = await logoutService()
+        if (response.ok) {
+            dispatch({ type: authTypes.loggedOut })
+        } else {
+            console.log("Hubo un error");
+        }
+    };
+
+
+
+    useEffect(() => {
         useSession()
     }, [])
 
     return (
-        <newContext.Provider value={{ state, login, registerUser, useSession}}>
+        <NewContext.Provider value={{ state, login, registerUser, signOut }}>
             {children}
-        </newContext.Provider>
+        </NewContext.Provider>
     );
 };
 
-export const authenticated = () => useContext(newContext);
+export const authenticated = () => useContext(NewContext)

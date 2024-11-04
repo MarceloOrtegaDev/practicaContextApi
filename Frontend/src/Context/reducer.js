@@ -1,10 +1,12 @@
-import { authTypes } from "./authTypes"
-export const reducer = (state, action) => {
-    if (action.type === authTypes.isLogged) {
-        return { ...state, user: true, payload: action.payload }
-    } else if (action.type === authTypes.loggedOut) {
-        return { ...state, user: false }
-    }
+import { authTypes } from "./authTypes";
 
-    return state
-}
+export const reducer = (state, action) => {
+    switch (action.type) {
+        case authTypes.isLogged:
+            return { ...state, user: action.payload, isLogged: true };
+        case authTypes.loggedOut:
+            return { ...state, user: null, isLogged: false };
+        default:
+            return state;
+    }
+};
